@@ -1,2 +1,12 @@
-# ifrn-messenger
-:blue_book: A messenger app to connect students at IFRN
+# Projeto Final de Des. para Dispositivos Móveis
+
+**Instituição**: Instituto Federal do Rio Grande do Norte
+
+**Curso**: Análise e Desenvolvimento de Sistemas
+
+**Período**: 2017.1
+
+**Disciplina**: Desenvolvimento para Dispositivos Móveis
+
+**Professor**: Fellipe Araujo Aleixo
+
