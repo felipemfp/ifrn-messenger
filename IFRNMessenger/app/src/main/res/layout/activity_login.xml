@@ -8,7 +8,7 @@
     android:gravity="center"
     android:layout_margin="50dp"
     android:orientation="vertical"
-    tools:context="br.com.postero.ifrnmessenger.activitys.LoginActivity">
+    tools:context="br.com.postero.ifrnmessenger.activities.LoginActivity">
 
     <TextView
         style="@style/Base.TextAppearance.AppCompat.Title"
