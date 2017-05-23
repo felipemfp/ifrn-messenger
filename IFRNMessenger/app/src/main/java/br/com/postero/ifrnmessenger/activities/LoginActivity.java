@@ -3,6 +3,7 @@ package br.com.postero.ifrnmessenger.activities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -54,6 +55,11 @@ public class LoginActivity extends AppCompatActivity {
             txtMatricula.requestFocus();
             return;
         }
+        else if (password.isEmpty()) {
+            txtSenha.setError("O campo Senha não pode ser vazio!");
+            txtSenha.requestFocus();
+            return;
+        }
 
         progressDialog.setMessage("Autenticando usuário...");
         progressDialog.show();
@@ -73,6 +79,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onError(VolleyError error) {
                         progressDialog.hide();
+                        showAlertError();
                     }
                 });
             }
@@ -80,7 +87,17 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onError(VolleyError error) {
                 progressDialog.hide();
+                showAlertError();
             }
         });
+    }
+
+    private void showAlertError() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.alert_error_title)
+                .setMessage(R.string.login_error)
+                .setPositiveButton(R.string.alert_error_button,null)
+                .create()
+                .show();
     }
 }

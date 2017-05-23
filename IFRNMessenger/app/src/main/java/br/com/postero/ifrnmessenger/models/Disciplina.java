@@ -37,6 +37,11 @@ public class Disciplina implements Serializable {
     public int numero_faltas;
     public String situacao;
 
+    public String getNome() {
+        String[] res = disciplina.split(" - ");
+        return res.length > 1 ? res[1] : this.disciplina;
+    }
+
     public interface ApiListener {
         void onSuccess(Object object);
 
