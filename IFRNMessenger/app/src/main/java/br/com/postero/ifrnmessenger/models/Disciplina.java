@@ -43,13 +43,10 @@ public class Disciplina implements Serializable {
         void onError(VolleyError error);
     }
 
-
     public static void listarTodos(final ApiListener listener) {
         Calendar calendar = Calendar.getInstance();
         int ano = calendar.get(Calendar.YEAR);
         int periodo = calendar.get(Calendar.MONTH) > 6 ? 2 : 1;
-
-        Log.i("Hey", ano + " | " + periodo);
 
         JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
@@ -58,16 +55,11 @@ public class Disciplina implements Serializable {
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
-                        Log.i("Response", response.toString());
                         Type type = new TypeToken<ArrayList<Disciplina>>() {
                         }.getType();
                         String results = response.toString();
 
                         ArrayList<Disciplina> disciplinas = new Gson().fromJson(results, type);
-
-                        for (Disciplina curso : disciplinas) {
-                            Log.i("Disc", curso.disciplina);
-                        }
                         listener.onSuccess(disciplinas);
                     }
                 }, new Response.ErrorListener() {
@@ -84,7 +76,6 @@ public class Disciplina implements Serializable {
                 return headers;
             }
         };
-        Log.i("Hey", request.toString());
         AppController.getInstance().addToRequestQueue(request);
     }
 }

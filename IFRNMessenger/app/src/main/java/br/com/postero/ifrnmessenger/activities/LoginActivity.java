@@ -1,32 +1,25 @@
 package br.com.postero.ifrnmessenger.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
 
 import br.com.postero.ifrnmessenger.R;
-import br.com.postero.ifrnmessenger.utils.AppController;
+import br.com.postero.ifrnmessenger.models.Usuario;
 import br.com.postero.ifrnmessenger.utils.P;
-import br.com.postero.ifrnmessenger.utils.SuapAPI;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText txtMatricula;
     private EditText txtSenha;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,38 +28,59 @@ public class LoginActivity extends AppCompatActivity {
 
         txtMatricula = (EditText) findViewById(R.id.txtLogin);
         txtSenha = (EditText) findViewById(R.id.txtSenha);
+
+        txtSenha.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (!txtMatricula.getText().toString().isEmpty() && !txtSenha.getText().toString().isEmpty()) {
+                    onLoginClick(v);
+                    return true;
+                }
+                return false;
+            }
+
+            ;
+        });
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCanceledOnTouchOutside(false);
     }
 
-
     public void onLoginClick(View v) {
-        final HashMap<String, String> hashMap = new HashMap<>();
+        String username = txtMatricula.getText().toString();
+        String password = txtSenha.getText().toString();
 
-        hashMap.put("username", txtMatricula.getText().toString());
-        hashMap.put("password", txtSenha.getText().toString());
+        if (username.isEmpty()) {
+            txtMatricula.setError("O campo Matrícula não pode ser vazio!");
+            txtMatricula.requestFocus();
+            return;
+        }
 
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.POST,
-                SuapAPI.URL_AUTH,
-                new JSONObject(hashMap),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        String token = null;
-                        try {
-                            token = response.getString("token");
-                            P.set("token", token);
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
+        progressDialog.setMessage("Autenticando usuário...");
+        progressDialog.show();
+
+        Usuario.autenticar(username, password, new Usuario.ApiListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                // TODO: Show errors
+            public void onSuccess(Object object) {
+                Usuario.meusDados(new Usuario.ApiListener() {
+                    @Override
+                    public void onSuccess(Object object) {
+                        Usuario usuario = (Usuario) object;
+                        P.setUsuario(usuario);
+                        progressDialog.hide();
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    }
+
+                    @Override
+                    public void onError(VolleyError error) {
+                        progressDialog.hide();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(VolleyError error) {
+                progressDialog.hide();
             }
         });
-
-        AppController.getInstance().addToRequestQueue(request);
     }
 }

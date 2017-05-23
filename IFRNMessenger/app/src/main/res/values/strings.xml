@@ -2,4 +2,8 @@
     <string name="app_name">IFRN Messenger</string>
     <string name="action_settings">Settings</string>
     <string name="btn_login">Entrar</string>
+    <string name="title_activity_dashboard">DashboardActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
