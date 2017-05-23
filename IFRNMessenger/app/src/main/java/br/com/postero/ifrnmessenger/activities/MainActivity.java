@@ -94,10 +94,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 Disciplina disciplina = disciplinas.get(position);
-
-                Snackbar.make(v,
-                        "Você tem " + disciplina.numero_faltas + " faltas na disciplina " + disciplina.disciplina + "!",
-                        Snackbar.LENGTH_SHORT).show();
+                onDisciplinaSelected(disciplina);
             }
         });
     }
@@ -118,6 +115,12 @@ public class MainActivity extends AppCompatActivity
         });
         lblUsuarioNome.setText(usuario.nome_usual);
         lblUsuarioEmail.setText(usuario.email);
+    }
+
+    private void onDisciplinaSelected(Disciplina disciplina) {
+        Intent intent = new Intent(this, DisciplinaActivity.class);
+        intent.putExtra("disciplina", disciplina);
+        startActivity(intent);
     }
 
     @Override
