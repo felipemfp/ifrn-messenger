@@ -37,7 +37,7 @@ public class DisciplinaActivity extends AppCompatActivity {
 
         disciplina = (Disciplina) getIntent().getSerializableExtra("disciplina");
 
-        this.setTitle(disciplina.getNome());
+        this.setTitle(disciplina.toString());
         toolbar.setSubtitle("Última mensagem às 12h15...");
     }
 

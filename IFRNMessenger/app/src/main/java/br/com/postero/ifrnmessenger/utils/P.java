@@ -46,23 +46,23 @@ public class P {
 
     public static void setUsuario(Usuario usuario) {
         P.usuario = usuario;
-        prefs.edit()
-                .putString(USUARIO_ID, usuario.id)
-                .putString(USUARIO_MATRICULA, usuario.matricula)
-                .putString(USUARIO_NOME_USUAL, usuario.nome_usual)
-                .putString(USUARIO_EMAIL, usuario.email)
-                .putString(USUARIO_URL_FOTO_75X100, usuario.url_foto_75x100)
-                .putString(USUARIO_TIPO_VINCULO, usuario.tipo_vinculo)
-                .putString(ALUNO_MATRICULA, usuario.vinculo.matricula)
-                .putString(ALUNO_NOME, usuario.vinculo.nome)
-                .putString(ALUNO_CURSO, usuario.vinculo.curso)
-                .putString(ALUNO_CAMPUS, usuario.vinculo.campus)
-                .putString(ALUNO_SITUACAO, usuario.vinculo.situacao)
-                .putString(ALUNO_COTA_SISTEC, usuario.vinculo.cota_sistec)
-                .putString(ALUNO_COTA_MEC, usuario.vinculo.cota_mec)
-                .putString(ALUNO_SITUACAO_SISTEMICA, usuario.vinculo.situacao_sistemica)
-                .putString(USUARIO_JSON, new Gson().toJson(usuario))
-                .apply();
+//        prefs.edit()
+//                .putString(USUARIO_ID, usuario.id)
+//                .putString(USUARIO_MATRICULA, usuario.matricula)
+//                .putString(USUARIO_NOME_USUAL, usuario.nome_usual)
+//                .putString(USUARIO_EMAIL, usuario.email)
+//                .putString(USUARIO_URL_FOTO_75X100, usuario.url_foto_75x100)
+//                .putString(USUARIO_TIPO_VINCULO, usuario.tipo_vinculo)
+//                .putString(ALUNO_MATRICULA, usuario.vinculo.matricula)
+//                .putString(ALUNO_NOME, usuario.vinculo.nome)
+//                .putString(ALUNO_CURSO, usuario.vinculo.curso)
+//                .putString(ALUNO_CAMPUS, usuario.vinculo.campus)
+//                .putString(ALUNO_SITUACAO, usuario.vinculo.situacao)
+//                .putString(ALUNO_COTA_SISTEC, usuario.vinculo.cota_sistec)
+//                .putString(ALUNO_COTA_MEC, usuario.vinculo.cota_mec)
+//                .putString(ALUNO_SITUACAO_SISTEMICA, usuario.vinculo.situacao_sistemica)
+//                .putString(USUARIO_JSON, new Gson().toJson(usuario))
+//                .apply();
     }
 
     public static void set(String key, String value) {

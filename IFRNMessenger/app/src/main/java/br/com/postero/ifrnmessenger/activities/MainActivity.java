@@ -58,11 +58,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        usuario = P.getUsuario();
+        usuario = Usuario.first(Usuario.class);
         if (usuario != null) {
             setContentView(R.layout.activity_main);
             this.vincularElementos();
-            this.carregarDisciplinas();
+            //this.carregarDisciplinas();
             this.carregarPeriodos();
         } else {
             this.finish();
@@ -154,6 +154,8 @@ public class MainActivity extends AppCompatActivity
                         }
                     });
                 }
+                periodoLetivo = periodoLetivos.get(periodoLetivos.size() - 1);
+                carregarDisciplinas();
             }
 
             @Override
@@ -208,6 +210,9 @@ public class MainActivity extends AppCompatActivity
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             P.limpar();
+                            Usuario.deleteAll(Usuario.class);
+                            Disciplina.deleteAll(Disciplina.class);
+                            PeriodoLetivo.deleteAll(PeriodoLetivo.class);
                             finish();
                             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                         }
@@ -221,11 +226,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private boolean onPeriodoLetivoSelected(MenuItem item) {
-        periodoLetivo = new PeriodoLetivo();
         String[] valores = item.getTitle().toString().split("\\"+PeriodoLetivo.SEPARATOR);
 
-        periodoLetivo.ano = Integer.valueOf(valores[0]);
-        periodoLetivo.periodo = Integer.valueOf(valores[1]);
+        periodoLetivo = PeriodoLetivo.find(PeriodoLetivo.class, "ano = ? and periodo = ?", valores).get(0);
 
         toolbar.setTitle(periodoLetivo.toString());
         this.carregarDisciplinas();

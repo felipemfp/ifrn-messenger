@@ -3,37 +3,32 @@ package br.com.postero.ifrnmessenger.models;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
-
-import org.json.JSONArray;
+import com.orm.SugarRecord;
+import com.orm.dsl.Ignore;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import br.com.postero.ifrnmessenger.utils.AppController;
-import br.com.postero.ifrnmessenger.utils.P;
 import br.com.postero.ifrnmessenger.utils.SuapAPI;
 
 /**
  * Created by Francisco on 23/05/2017.
  */
 
-public class PeriodoLetivo implements Serializable {
+public class PeriodoLetivo extends SugarRecord implements Serializable {
+    @Ignore
     public static String SEPARATOR = ".";
     public int ano;
     public int periodo;
@@ -51,6 +46,13 @@ public class PeriodoLetivo implements Serializable {
 
     public static void listarTodos(final PeriodoLetivo.ApiListener listener) {
 
+        List<PeriodoLetivo> periodos = PeriodoLetivo.listAll(PeriodoLetivo.class);
+        if (periodos.size() > 0) {
+            Log.i("Achou periodos", periodos.size() + "");
+            listener.onSuccess(periodos);
+            return;
+        }
+
         StringRequest request = new StringRequest(
                 SuapAPI.URL_PERIODOS_LETIVOS,
                 new Response.Listener<String>() {
@@ -65,6 +67,7 @@ public class PeriodoLetivo implements Serializable {
                             PeriodoLetivo periodoLetivo = new PeriodoLetivo();
                             periodoLetivo.ano = element.get("ano_letivo").getAsInt();
                             periodoLetivo.periodo = element.get("periodo_letivo").getAsInt();
+                            periodoLetivo.save();
                             periodoLetivos.add(periodoLetivo);
                             Log.i("PeriodoLetivo", periodoLetivo.ano + " / " + periodoLetivo.periodo);
                         }
@@ -80,7 +83,7 @@ public class PeriodoLetivo implements Serializable {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "JWT " + P.get("token"));
+                headers.put("Authorization", "JWT " + Usuario.first(Usuario.class).token);
                 return headers;
             }
         };

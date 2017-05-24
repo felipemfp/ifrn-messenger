@@ -37,7 +37,7 @@ public class DisciplinaAdapter extends RecyclerView.Adapter<DisciplinaAdapter.Vi
 
         Disciplina disciplina = disciplinas.get(position);
 
-        holder.lblDescricao.setText(disciplina.getNome());
+        holder.lblDescricao.setText(disciplina.toString());
     }
 
     @Override

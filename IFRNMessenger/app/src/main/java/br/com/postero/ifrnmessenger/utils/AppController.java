@@ -6,6 +6,7 @@ import android.content.Context;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.orm.SugarContext;
 
 /**
  * Created by Francisco on 21/05/2017.
@@ -19,6 +20,7 @@ public class AppController extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
+        SugarContext.init(this);
     }
 
     public static synchronized AppController getInstance() {

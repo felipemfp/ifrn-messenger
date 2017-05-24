@@ -6,11 +6,13 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.orm.SugarRecord;
+import com.orm.dsl.Unique;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -26,14 +28,20 @@ import br.com.postero.ifrnmessenger.utils.SuapAPI;
  * Created by Francisco on 21/05/2017.
  */
 
-public class Usuario implements Serializable {
-    public String id;
+public class Usuario extends SugarRecord implements Serializable {
+    public String codigo;
+    public String token;
     public String matricula;
     public String nome_usual;
     public String email;
-    public String url_foto_75x100;
-    public String tipo_vinculo;
-    public Aluno vinculo;
+    public String foto;
+    public String nome;
+    public String curso;
+    public String campus;
+
+    public Usuario() {
+
+    }
 
     public interface ApiListener {
         void onSuccess(Object object);
@@ -41,24 +49,22 @@ public class Usuario implements Serializable {
         void onError(VolleyError error);
     }
 
-    public static void autenticar(String username, String password, final Usuario.ApiListener listener) {
-        HashMap<String, String> hashMap = new HashMap<>();
+    public static void autenticar(final String username, final String password, final Usuario.ApiListener listener) {
+        final HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("username", username);
         hashMap.put("password", password);
-        JsonObjectRequest request = new JsonObjectRequest(
+        StringRequest request = new StringRequest(
                 Request.Method.POST,
                 SuapAPI.URL_AUTH,
-                new JSONObject(hashMap),
-                new Response.Listener<JSONObject>() {
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        String token = null;
-                        try {
-                            token = response.getString("token");
-                            P.set("token", token);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                    public void onResponse(String response) {
+                        JsonObject object = new Gson().fromJson(response, JsonObject.class);
+                        String token = object.get("token").getAsString();
+                        Usuario usuario = new Usuario();
+                        usuario.matricula = username;
+                        usuario.token = token;
+                        Log.i("Usuario ID: ", "" + usuario.save());
                         listener.onSuccess(token);
                     }
                 }, new Response.ErrorListener() {
@@ -67,23 +73,35 @@ public class Usuario implements Serializable {
                 Log.e("error", error.toString());
                 listener.onError(error);
             }
-        });
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                return hashMap;
+            }
+        };
 
         AppController.getInstance().addToRequestQueue(request);
     }
 
     public static void meusDados(final Usuario.ApiListener listener) {
-        JsonObjectRequest request = new JsonObjectRequest(
+        StringRequest request = new StringRequest(
                 SuapAPI.URL_MEUS_DADOS,
-                null,
-                new Response.Listener<JSONObject>() {
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        Type type = new TypeToken<Usuario>() {
-                        }.getType();
-                        String result = response.toString();
+                    public void onResponse(String response) {
+                        JsonObject aluno = new Gson().fromJson(response, JsonObject.class);
+                        JsonObject vinculo = aluno.getAsJsonObject("vinculo");
+                        Usuario usuario = Usuario.first(Usuario.class);
 
-                        Usuario usuario = new Gson().fromJson(result, type);
+                        usuario.codigo = aluno.get("id").getAsString();
+                        usuario.nome_usual = aluno.get("nome_usual").getAsString();
+                        usuario.email = aluno.get("email").getAsString();
+                        usuario.foto = aluno.get("url_foto_75x100").getAsString();
+                        usuario.nome = vinculo.get("nome").getAsString();
+                        usuario.curso = vinculo.get("curso").getAsString();
+                        usuario.campus = vinculo.get("campus").getAsString();
+                        usuario.save();
+
                         listener.onSuccess(usuario);
                     }
                 }, new Response.ErrorListener() {
@@ -96,7 +114,7 @@ public class Usuario implements Serializable {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "JWT " + P.get("token"));
+                headers.put("Authorization", "JWT " + Usuario.first(Usuario.class).token);
                 return headers;
             }
         };
