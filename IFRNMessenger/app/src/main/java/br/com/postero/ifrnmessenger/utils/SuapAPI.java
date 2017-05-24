@@ -11,5 +11,5 @@ public class SuapAPI {
 
     public static String URL_MEUS_DADOS = URL_BASE + "minhas-informacoes/meus-dados/";
     public static String URL_BOLETIM = URL_BASE + "minhas-informacoes/boletim/";
-
+    public static String URL_PERIODOS_LETIVOS = URL_BASE + "minhas-informacoes/meus-periodos-letivos/";
 }

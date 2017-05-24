@@ -73,6 +73,7 @@ public class LoginActivity extends AppCompatActivity {
                         Usuario usuario = (Usuario) object;
                         P.setUsuario(usuario);
                         progressDialog.hide();
+                        finish();
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     }
 

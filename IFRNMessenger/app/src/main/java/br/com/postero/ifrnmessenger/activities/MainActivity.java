@@ -1,5 +1,6 @@
 package br.com.postero.ifrnmessenger.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -8,15 +9,19 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 
@@ -25,6 +30,7 @@ import java.util.ArrayList;
 import br.com.postero.ifrnmessenger.R;
 import br.com.postero.ifrnmessenger.adapters.DisciplinaAdapter;
 import br.com.postero.ifrnmessenger.models.Disciplina;
+import br.com.postero.ifrnmessenger.models.PeriodoLetivo;
 import br.com.postero.ifrnmessenger.models.Usuario;
 import br.com.postero.ifrnmessenger.utils.ItemClickSupport;
 import br.com.postero.ifrnmessenger.utils.P;
@@ -34,10 +40,16 @@ public class MainActivity extends AppCompatActivity
 
     private TextView lblUsuarioNome;
     private TextView lblUsuarioEmail;
-    private View navHeader;
 
     private Usuario usuario;
+    private PeriodoLetivo periodoLetivo;
     private ArrayList<Disciplina> disciplinas;
+
+    private Toolbar toolbar;
+    private View navHeader;
+    private Menu navMenu;
+    private MenuItem lastMenuItem;
+    private DrawerLayout drawerLayout;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -51,15 +63,15 @@ public class MainActivity extends AppCompatActivity
             setContentView(R.layout.activity_main);
             this.vincularElementos();
             this.carregarDisciplinas();
+            this.carregarPeriodos();
         } else {
             this.finish();
             startActivity(new Intent(this, LoginActivity.class));
         }
-
     }
 
     private void vincularElementos() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -71,18 +83,22 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+                this, drawerLayout , toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout .setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navHeader = navigationView.getHeaderView(0);
+        navMenu = navigationView.getMenu();
         navigationView.setNavigationItemSelectedListener(this);
 
         lblUsuarioNome = (TextView) navHeader.findViewById(R.id.lblUsuarioNome);
         lblUsuarioEmail = (TextView) navHeader.findViewById(R.id.lblUsuarioEmail);
+
+        lblUsuarioNome.setText(usuario.nome_usual);
+        lblUsuarioEmail.setText(usuario.email);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
@@ -100,7 +116,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void carregarDisciplinas() {
-        Disciplina.listarTodos(new Disciplina.ApiListener() {
+        Disciplina.listarTodos(periodoLetivo, new Disciplina.ApiListener() {
             @Override
             public void onSuccess(Object object) {
                 disciplinas = (ArrayList<Disciplina>) object;
@@ -113,8 +129,38 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
-        lblUsuarioNome.setText(usuario.nome_usual);
-        lblUsuarioEmail.setText(usuario.email);
+    }
+
+    private void carregarPeriodos() {
+        PeriodoLetivo.listarTodos(new PeriodoLetivo.ApiListener() {
+            @Override
+            public void onSuccess(Object object) {
+                ArrayList<PeriodoLetivo> periodoLetivos = (ArrayList<PeriodoLetivo>) object;
+                //SubMenu subMenu = navMenu.addSubMenu("Periodos");
+                SubMenu subMenu = navMenu.getItem(0).getSubMenu();
+                int i = 1;
+                for (PeriodoLetivo periodo : periodoLetivos) {
+                    MenuItem item = subMenu.add(periodo.toString()).setIcon(R.drawable.ic_menu_send).setCheckable(true);
+                    //MenuItem item = navMenu.add(R.id.nav_group, Menu.NONE, 0, periodo.toString());
+                    item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            if (lastMenuItem != null) {
+                                lastMenuItem.setChecked(false);
+                            }
+                            item.setChecked(true);
+                            lastMenuItem = item;
+                            return onPeriodoLetivoSelected(item);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onError(VolleyError error) {
+
+            }
+        });
     }
 
     private void onDisciplinaSelected(Disciplina disciplina) {
@@ -129,7 +175,7 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            this.finish();
         }
     }
 
@@ -155,13 +201,36 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_logout:
-                P.limpar();
-                this.finish();
-                startActivity(new Intent(this, LoginActivity.class));
+                new AlertDialog.Builder(this)
+                    .setTitle("Deseja mesmo sair?")
+                    .setMessage("Essa operação removerá seus dados já salvos no dispositivo")
+                    .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            P.limpar();
+                            finish();
+                            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                        }
+                    })
+                    .setNegativeButton("Não", null)
+                    .create()
+                    .show();
         }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private boolean onPeriodoLetivoSelected(MenuItem item) {
+        periodoLetivo = new PeriodoLetivo();
+        String[] valores = item.getTitle().toString().split("\\"+PeriodoLetivo.SEPARATOR);
+
+        periodoLetivo.ano = Integer.valueOf(valores[0]);
+        periodoLetivo.periodo = Integer.valueOf(valores[1]);
+
+        toolbar.setTitle(periodoLetivo.toString());
+        this.carregarDisciplinas();
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
 }

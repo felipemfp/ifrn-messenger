@@ -48,10 +48,17 @@ public class Disciplina implements Serializable {
         void onError(VolleyError error);
     }
 
-    public static void listarTodos(final ApiListener listener) {
-        Calendar calendar = Calendar.getInstance();
-        int ano = calendar.get(Calendar.YEAR);
-        int periodo = calendar.get(Calendar.MONTH) > 6 ? 2 : 1;
+    public static void listarTodos(PeriodoLetivo periodoLetivo, final ApiListener listener) {
+        int ano, periodo;
+        if (periodoLetivo != null) {
+            ano = periodoLetivo.ano;
+            periodo = periodoLetivo.periodo;
+        }
+        else {
+            Calendar calendar = Calendar.getInstance();
+            ano = calendar.get(Calendar.YEAR);
+            periodo = calendar.get(Calendar.MONTH) > 6 ? 2 : 1;
+        }
 
         JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
