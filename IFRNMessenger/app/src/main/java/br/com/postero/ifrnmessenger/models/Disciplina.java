@@ -5,12 +5,14 @@ import android.util.Log;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.orm.SugarRecord;
+
+import org.json.JSONArray;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -66,14 +68,15 @@ public class Disciplina extends SugarRecord implements Serializable {
             ano = calendar.get(Calendar.YEAR);
             periodo = calendar.get(Calendar.MONTH) > 6 ? 2 : 1;
         }
-
-        StringRequest request = new StringRequest(
+        JsonArrayRequest request = new JsonArrayRequest(
                 SuapAPI.URL_BOLETIM + ano + "/" + periodo + "/",
-                new Response.Listener<String>() {
+                new Response.Listener<JSONArray>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONArray response) {
+                        String result = response.toString();
+                        Log.i("Response:", result);
                         ArrayList<Disciplina> disciplinas = new ArrayList<>();
-                        JsonArray object = new Gson().fromJson(response, JsonArray.class);
+                        JsonArray object = new Gson().fromJson(result, JsonArray.class);
                         Iterator<JsonElement> iterator = object.iterator();
                         while (iterator.hasNext()) {
                             JsonObject element = iterator.next().getAsJsonObject();

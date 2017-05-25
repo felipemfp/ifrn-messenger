@@ -1,5 +1,6 @@
 package br.com.postero.ifrnmessenger.activities;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -43,7 +44,10 @@ public class MainActivity extends AppCompatActivity
 
     private Usuario usuario;
     private PeriodoLetivo periodoLetivo;
+    private ArrayList<PeriodoLetivo> periodoLetivos;
     private ArrayList<Disciplina> disciplinas;
+
+    private ProgressDialog progressDialog;
 
     private Toolbar toolbar;
     private View navHeader;
@@ -62,7 +66,11 @@ public class MainActivity extends AppCompatActivity
         if (usuario != null) {
             setContentView(R.layout.activity_main);
             this.vincularElementos();
-            //this.carregarDisciplinas();
+
+            if (PeriodoLetivo.count(PeriodoLetivo.class) == 0) {
+                progressDialog.setMessage("Carregando Periodos...");
+                progressDialog.show();
+            }
             this.carregarPeriodos();
         } else {
             this.finish();
@@ -85,8 +93,8 @@ public class MainActivity extends AppCompatActivity
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout , toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout .setDrawerListener(toggle);
+                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -99,6 +107,9 @@ public class MainActivity extends AppCompatActivity
 
         lblUsuarioNome.setText(usuario.nome_usual);
         lblUsuarioEmail.setText(usuario.email);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCanceledOnTouchOutside(false);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
@@ -120,8 +131,13 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onSuccess(Object object) {
                 disciplinas = (ArrayList<Disciplina>) object;
-                adapter = new DisciplinaAdapter(disciplinas);
-                recyclerView.setAdapter(adapter);
+                PeriodoLetivo periodo = disciplinas.get(0).periodoLetivo;
+                Log.i("Periodo:", periodoLetivo.toString() + " " + periodo.toString());
+                if (periodoLetivo.getId().equals(periodo.getId())) {
+                    adapter = new DisciplinaAdapter(disciplinas);
+                    recyclerView.setAdapter(adapter);
+                    progressDialog.hide();
+                }
             }
 
             @Override
@@ -135,13 +151,11 @@ public class MainActivity extends AppCompatActivity
         PeriodoLetivo.listarTodos(new PeriodoLetivo.ApiListener() {
             @Override
             public void onSuccess(Object object) {
-                ArrayList<PeriodoLetivo> periodoLetivos = (ArrayList<PeriodoLetivo>) object;
-                //SubMenu subMenu = navMenu.addSubMenu("Periodos");
+                periodoLetivos = (ArrayList<PeriodoLetivo>) object;
                 SubMenu subMenu = navMenu.getItem(0).getSubMenu();
                 int i = 1;
                 for (PeriodoLetivo periodo : periodoLetivos) {
                     MenuItem item = subMenu.add(periodo.toString()).setIcon(R.drawable.ic_menu_send).setCheckable(true);
-                    //MenuItem item = navMenu.add(R.id.nav_group, Menu.NONE, 0, periodo.toString());
                     item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
@@ -153,9 +167,9 @@ public class MainActivity extends AppCompatActivity
                             return onPeriodoLetivoSelected(item);
                         }
                     });
+                    periodoLetivo = periodo;
+                    carregarDisciplinas();
                 }
-                periodoLetivo = periodoLetivos.get(periodoLetivos.size() - 1);
-                carregarDisciplinas();
             }
 
             @Override
@@ -204,29 +218,29 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.nav_logout:
                 new AlertDialog.Builder(this)
-                    .setTitle("Deseja mesmo sair?")
-                    .setMessage("Essa operação removerá seus dados já salvos no dispositivo")
-                    .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            P.limpar();
-                            Usuario.deleteAll(Usuario.class);
-                            Disciplina.deleteAll(Disciplina.class);
-                            PeriodoLetivo.deleteAll(PeriodoLetivo.class);
-                            finish();
-                            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-                        }
-                    })
-                    .setNegativeButton("Não", null)
-                    .create()
-                    .show();
+                        .setTitle("Deseja mesmo sair?")
+                        .setMessage("Essa operação removerá seus dados já salvos no dispositivo")
+                        .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                P.limpar();
+                                Usuario.deleteAll(Usuario.class);
+                                Disciplina.deleteAll(Disciplina.class);
+                                PeriodoLetivo.deleteAll(PeriodoLetivo.class);
+                                finish();
+                                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                            }
+                        })
+                        .setNegativeButton("Não", null)
+                        .create()
+                        .show();
         }
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
     private boolean onPeriodoLetivoSelected(MenuItem item) {
-        String[] valores = item.getTitle().toString().split("\\"+PeriodoLetivo.SEPARATOR);
+        String[] valores = item.getTitle().toString().split("\\" + PeriodoLetivo.SEPARATOR);
 
         periodoLetivo = PeriodoLetivo.find(PeriodoLetivo.class, "ano = ? and periodo = ?", valores).get(0);
 
