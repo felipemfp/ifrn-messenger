@@ -1,3 +1,5 @@
+<img align="right" width="250" src="images/ifrn-messenger.png">
+
 # IFRN Messenger
 
 Aplicativo de troca de mensagens para conectar estudantes do IFRN.
