@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "194542880013",
+    "firebase_url": "https://ifrnmessenger.firebaseio.com",
+    "project_id": "ifrnmessenger",
+    "storage_bucket": "ifrnmessenger.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:194542880013:android:be37696eb1d50e22",
+        "android_client_info": {
+          "package_name": "br.com.postero.ifrnmessenger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "194542880013-5tu18jc93f5irbpncf1md25rac3enre2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.postero.ifrnmessenger",
+            "certificate_hash": "85b5730f1b1420d2df2fa43fde9910410629c502"
+          }
+        },
+        {
+          "client_id": "194542880013-njj01d0ib53dshupagnml85pk3f2vu1d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzdAsDzg6q-nm4PUD8ONTmMJl5hs90QKE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "194542880013-njj01d0ib53dshupagnml85pk3f2vu1d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
