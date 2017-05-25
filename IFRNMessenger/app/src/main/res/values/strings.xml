@@ -9,5 +9,8 @@
     <string name="alert_error_title">Erro na operação</string>
     <string name="alert_error_button">Ok</string>
     <string name="login_error">Verifique se as credenciais informadas estão corretas!</string>
+    <string name="login_error_credential">O campo Matrícula não pode ser vazio!</string>
+    <string name="login_error_password">O campo Senha não pode ser vazio!</string>
+    <string name="login_loading">Autenticando usuário...</string>
     <string name="title_activity_disciplina">DisciplinaActivity</string>
 </resources>

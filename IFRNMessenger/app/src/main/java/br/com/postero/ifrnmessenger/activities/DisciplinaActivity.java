@@ -24,6 +24,7 @@ public class DisciplinaActivity extends AppCompatActivity {
     private Usuario usuario;
     private Disciplina disciplina;
     private Mensagem mensagem;
+    private Mensagem ultimaMensagem;
 
     private EditText txtMensagem;
     private Toolbar toolbar;
@@ -86,7 +87,6 @@ public class DisciplinaActivity extends AppCompatActivity {
 
     private void carregarMensagens() {
         listMessages = (ListView) findViewById(R.id.listMessages);
-
         adapter = new FirebaseListAdapter<Mensagem>(this, Mensagem.class,
                 R.layout.disciplina_menssagem, chat) {
             @Override
@@ -97,11 +97,19 @@ public class DisciplinaActivity extends AppCompatActivity {
 
                 lblMensagemConteudo.setText(model.conteudo);
                 lblMensagemUsuario.setText(model.usuario.nome_usual);
-                lblMensagemTempo.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", model.tempo));
+                lblMensagemTempo.setText(DateFormat.format("HH:mm", model.tempo));
 
-                toolbar.setSubtitle("Última mensagem às " + DateFormat.format("HH:mm", model.tempo));
+                if (ultimaMensagem == null) {
+                    ultimaMensagem = model;
+                } else if (model.tempo > ultimaMensagem.tempo) {
+                    ultimaMensagem = model;
+                }
+
+                toolbar.setSubtitle("Última mensagem às " + DateFormat.format("HH:mm", ultimaMensagem.tempo));
             }
         };
+
+
 
         listMessages.setAdapter(adapter);
     }

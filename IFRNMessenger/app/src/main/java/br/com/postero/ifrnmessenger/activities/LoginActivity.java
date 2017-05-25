@@ -51,17 +51,17 @@ public class LoginActivity extends AppCompatActivity {
         String password = txtSenha.getText().toString();
 
         if (username.isEmpty()) {
-            txtMatricula.setError("O campo Matrícula não pode ser vazio!");
+            txtMatricula.setError(getString(R.string.login_error_credential));
             txtMatricula.requestFocus();
             return;
         }
         else if (password.isEmpty()) {
-            txtSenha.setError("O campo Senha não pode ser vazio!");
+            txtSenha.setError(getString(R.string.login_error_password));
             txtSenha.requestFocus();
             return;
         }
 
-        progressDialog.setMessage("Autenticando usuário...");
+        progressDialog.setMessage(getString(R.string.login_loading));
         progressDialog.show();
 
         Usuario.autenticar(username, password, new Usuario.ApiListener() {

@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -59,9 +60,24 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
 
+    static boolean isFirebaseInitialized = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        try {
+            if (!isFirebaseInitialized) {
+                FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+                isFirebaseInitialized = true;
+            } else {
+                Log.d("Firebase:", "Already initialized.");
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
         usuario = Usuario.first(Usuario.class);
         if (usuario != null) {
             setContentView(R.layout.activity_main);
