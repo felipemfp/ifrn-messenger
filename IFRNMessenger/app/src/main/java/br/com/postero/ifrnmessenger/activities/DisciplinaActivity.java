@@ -4,12 +4,15 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -95,16 +98,27 @@ public class DisciplinaActivity extends AppCompatActivity {
                 R.layout.disciplina_menssagem, chat) {
             @Override
             protected void populateView(View v, Mensagem model, int position) {
-                RelativeLayout layBalao = (RelativeLayout) v.findViewById(R.id.layBalao);
                 TextView lblMensagemConteudo = (TextView) v.findViewById(R.id.lblMensagemConteudo);
                 TextView lblMensagemUsuario = (TextView) v.findViewById(R.id.lblMensagemUsuario);
                 TextView lblMensagemTempo = (TextView) v.findViewById(R.id.lblMensagemTempo);
 
+                // Personalizando
                 if (model.usuario.matricula.equals(usuario.matricula)) {
+                    LinearLayout layBalao = (LinearLayout) v.findViewById(R.id.layBalao);
+                    LinearLayout layItem = (LinearLayout) v.findViewById(R.id.layItem);
+
+                    // Item
+                    layItem.setGravity(Gravity.RIGHT);
+
+                    // Nome do Usuário
+                    lblMensagemUsuario.setVisibility(View.GONE);
+
+                    // Balão
+                    layBalao.setGravity(Gravity.RIGHT);
                     layBalao.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.my_message_background));
-                    ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) layBalao.getLayoutParams();
-                    if (marginLayoutParams.rightMargin > marginLayoutParams.leftMargin) {
-                        marginLayoutParams.setMargins(marginLayoutParams.rightMargin, marginLayoutParams.topMargin, marginLayoutParams.leftMargin, marginLayoutParams.bottomMargin);
+                    LinearLayout.LayoutParams balaoParams = (LinearLayout.LayoutParams) layBalao.getLayoutParams();
+                    if (balaoParams.rightMargin > balaoParams.leftMargin) {
+                        balaoParams.setMargins(balaoParams.rightMargin, balaoParams.topMargin, balaoParams.leftMargin, balaoParams.bottomMargin);
                     }
                 }
 
