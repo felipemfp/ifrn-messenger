@@ -26,37 +26,51 @@
         android:dividerHeight="16dp"
         android:transcriptMode="alwaysScroll"
         android:stackFromBottom="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/btnSend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:clickable="true"
-            android:src="@drawable/ic_menu_send"
-            android:tint="@android:color/white"
-            app:fabSize="mini" />
+        android:layout_height="wrap_content"
+        android:gravity="center">
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@id/fab">
+            android:layout_weight="1">
 
             <EditText
                 android:id="@+id/txtMensagem"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:maxHeight="150dp"
                 android:hint="Digite uma mensagem" />
         </android.support.design.widget.TextInputLayout>
 
-    </RelativeLayout>
+        <ImageButton
+            android:id="@+id/btnSend"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:src="@drawable/ic_menu_send"
+            android:tint="@color/colorAccent"
+            android:background="#00FFFFFF"
+            />
+
+
+
+        <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:id="@+id/btnSend"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:clickable="true"-->
+            <!--android:src="@drawable/ic_menu_send"-->
+            <!--android:tint="@android:color/white"-->
+            <!--app:fabSize="mini" />-->
+
+
+
+    </LinearLayout>
 
 
 </LinearLayout>

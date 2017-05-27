@@ -2,12 +2,16 @@ package br.com.postero.ifrnmessenger.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseListAdapter;
@@ -47,7 +51,7 @@ public class DisciplinaActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton btnSend = (FloatingActionButton)findViewById(R.id.btnSend);
+        ImageButton btnSend = (ImageButton)findViewById(R.id.btnSend);
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,7 +77,7 @@ public class DisciplinaActivity extends AppCompatActivity {
     }
 
     private void onSendClick(View v) {
-        String conteudo = txtMensagem.getText().toString();
+        String conteudo = txtMensagem.getText().toString().trim();
 
         if (conteudo.isEmpty()) {
             return;
@@ -91,9 +95,18 @@ public class DisciplinaActivity extends AppCompatActivity {
                 R.layout.disciplina_menssagem, chat) {
             @Override
             protected void populateView(View v, Mensagem model, int position) {
+                RelativeLayout layBalao = (RelativeLayout) v.findViewById(R.id.layBalao);
                 TextView lblMensagemConteudo = (TextView) v.findViewById(R.id.lblMensagemConteudo);
                 TextView lblMensagemUsuario = (TextView) v.findViewById(R.id.lblMensagemUsuario);
                 TextView lblMensagemTempo = (TextView) v.findViewById(R.id.lblMensagemTempo);
+
+                if (model.usuario.matricula.equals(usuario.matricula)) {
+                    layBalao.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.my_message_background));
+                    ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) layBalao.getLayoutParams();
+                    if (marginLayoutParams.rightMargin > marginLayoutParams.leftMargin) {
+                        marginLayoutParams.setMargins(marginLayoutParams.rightMargin, marginLayoutParams.topMargin, marginLayoutParams.leftMargin, marginLayoutParams.bottomMargin);
+                    }
+                }
 
                 lblMensagemConteudo.setText(model.conteudo);
                 lblMensagemUsuario.setText(model.usuario.nome_usual);
