@@ -5,6 +5,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.view.Gravity;
@@ -18,6 +20,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseListAdapter;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -35,12 +41,13 @@ public class DisciplinaActivity extends AppCompatActivity {
 
     private EditText txtMensagem;
     private Toolbar toolbar;
-    private ListView listMessages;
+    private RecyclerView listMessages;
+    private LinearLayoutManager listMessagesManager;
 
     private FirebaseDatabase db;
     private DatabaseReference chat;
 
-    private FirebaseListAdapter<Mensagem> adapter;
+    private FirebaseRecyclerAdapter<Mensagem, MensagemViewHolder> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +76,11 @@ public class DisciplinaActivity extends AppCompatActivity {
         db = FirebaseDatabase.getInstance();
         chat = db.getReference(disciplina.codigo);
 
+        listMessages = (RecyclerView) findViewById(R.id.listMessages);
+        listMessagesManager = new LinearLayoutManager(this);
+        listMessagesManager.setStackFromEnd(true);
+        listMessages.setLayoutManager(listMessagesManager);
+
         mensagem = new Mensagem();
         mensagem.usuario = usuario;
         mensagem.disciplina = disciplina;
@@ -90,41 +102,61 @@ public class DisciplinaActivity extends AppCompatActivity {
         chat.push().setValue(mensagem);
 
         txtMensagem.setText("");
+
+        listMessages.post(new Runnable() {
+            @Override
+            public void run() {
+                listMessages.smoothScrollToPosition(adapter.getItemCount() - 1);
+            }
+        });
     }
 
     private void carregarMensagens() {
-        listMessages = (ListView) findViewById(R.id.listMessages);
-        adapter = new FirebaseListAdapter<Mensagem>(this, Mensagem.class,
-                R.layout.disciplina_menssagem, chat) {
+
+        adapter = new FirebaseRecyclerAdapter<Mensagem, MensagemViewHolder>(
+                Mensagem.class,
+                R.layout.disciplina_menssagem,
+                MensagemViewHolder.class,
+                chat
+        ) {
+
             @Override
-            protected void populateView(View v, Mensagem model, int position) {
-                TextView lblMensagemConteudo = (TextView) v.findViewById(R.id.lblMensagemConteudo);
-                TextView lblMensagemUsuario = (TextView) v.findViewById(R.id.lblMensagemUsuario);
-                TextView lblMensagemTempo = (TextView) v.findViewById(R.id.lblMensagemTempo);
+            protected void populateViewHolder(MensagemViewHolder viewHolder, Mensagem model, int position) {
 
                 // Personalizando
                 if (model.usuario.matricula.equals(usuario.matricula)) {
-                    LinearLayout layBalao = (LinearLayout) v.findViewById(R.id.layBalao);
-                    LinearLayout layItem = (LinearLayout) v.findViewById(R.id.layItem);
-
                     // Item
-                    layItem.setGravity(Gravity.RIGHT);
+                    viewHolder.layItem.setGravity(Gravity.RIGHT);
 
                     // Nome do Usuário
-                    lblMensagemUsuario.setVisibility(View.GONE);
+                    viewHolder.lblMensagemUsuario.setVisibility(View.GONE);
 
                     // Balão
-                    layBalao.setGravity(Gravity.RIGHT);
-                    layBalao.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.my_message_background));
-                    LinearLayout.LayoutParams balaoParams = (LinearLayout.LayoutParams) layBalao.getLayoutParams();
+                    viewHolder.layBalao.setGravity(Gravity.RIGHT);
+                    viewHolder.layBalao.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.my_message_background));
+                    LinearLayout.LayoutParams balaoParams = (LinearLayout.LayoutParams) viewHolder.layBalao.getLayoutParams();
                     if (balaoParams.rightMargin > balaoParams.leftMargin) {
+                        balaoParams.setMargins(balaoParams.rightMargin, balaoParams.topMargin, balaoParams.leftMargin, balaoParams.bottomMargin);
+                    }
+                } else {
+                    // Item
+                    viewHolder.layItem.setGravity(Gravity.LEFT);
+
+                    // Nome do Usuário
+                    viewHolder.lblMensagemUsuario.setVisibility(View.VISIBLE);
+
+                    // Balão
+                    viewHolder.layBalao.setGravity(Gravity.LEFT);
+                    viewHolder.layBalao.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.background));
+                    LinearLayout.LayoutParams balaoParams = (LinearLayout.LayoutParams) viewHolder.layBalao.getLayoutParams();
+                    if (balaoParams.leftMargin > balaoParams.rightMargin) {
                         balaoParams.setMargins(balaoParams.rightMargin, balaoParams.topMargin, balaoParams.leftMargin, balaoParams.bottomMargin);
                     }
                 }
 
-                lblMensagemConteudo.setText(model.conteudo);
-                lblMensagemUsuario.setText(model.usuario.nome_usual);
-                lblMensagemTempo.setText(DateFormat.format("HH:mm", model.tempo));
+                viewHolder.lblMensagemConteudo.setText(model.conteudo);
+                viewHolder.lblMensagemUsuario.setText(model.usuario.nome_usual);
+                viewHolder.lblMensagemTempo.setText(DateFormat.format("HH:mm", model.tempo));
 
                 if (ultimaMensagem == null) {
                     ultimaMensagem = model;
@@ -136,9 +168,25 @@ public class DisciplinaActivity extends AppCompatActivity {
             }
         };
 
-
-
         listMessages.setAdapter(adapter);
+    }
+
+    public static class MensagemViewHolder extends RecyclerView.ViewHolder {
+        TextView lblMensagemConteudo;
+        TextView lblMensagemUsuario;
+        TextView lblMensagemTempo;
+        LinearLayout layBalao;
+        LinearLayout layItem;
+
+
+        public MensagemViewHolder(View v) {
+            super(v);
+            lblMensagemConteudo = (TextView) v.findViewById(R.id.lblMensagemConteudo);
+            lblMensagemUsuario = (TextView) v.findViewById(R.id.lblMensagemUsuario);
+            lblMensagemTempo = (TextView) v.findViewById(R.id.lblMensagemTempo);
+            layBalao = (LinearLayout) v.findViewById(R.id.layBalao);
+            layItem = (LinearLayout) v.findViewById(R.id.layItem);
+        }
     }
 
 }
