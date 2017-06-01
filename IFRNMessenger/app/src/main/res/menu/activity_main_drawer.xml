@@ -1,43 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <group
-        android:id="@+id/nav_group"
-        android:checkableBehavior="single">
-        <!--<item-->
-        <!--android:id="@+id/nav_camera"-->
-        <!--android:icon="@drawable/ic_menu_camera"-->
-        <!--android:title="Import" />-->
-        <!--<item-->
-        <!--android:id="@+id/nav_gallery"-->
-        <!--android:icon="@drawable/ic_menu_gallery"-->
-        <!--android:title="Gallery" />-->
-        <!--<item-->
-        <!--android:id="@+id/nav_slideshow"-->
-        <!--android:icon="@drawable/ic_menu_slideshow"-->
-        <!--android:title="Slideshow" />-->
-        <!--<item-->
-        <!--android:id="@+id/nav_manage"-->
-        <!--android:icon="@drawable/ic_menu_manage"-->
-        <!--android:title="Tools" />-->
-    </group>
     <item android:title="Periodos">
         <menu>
             <group android:checkableBehavior="single"></group>
         </menu>
     </item>
-    <item android:title="Communicate">
+    <item android:title="Configuração">
         <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:orderInCategory="1"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:orderInCategory="1"
-                android:title="Send" />
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@android:drawable/ic_lock_power_off"

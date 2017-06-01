@@ -12,16 +12,12 @@
         android:id="@+id/listMessages"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:layout_above="@id/fab"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:layout_marginTop="?attr/actionBarSize"
+        android:layout_weight="1"
         android:divider="@android:color/transparent"
         android:dividerHeight="16dp"
         android:scrollbars="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
     <LinearLayout
@@ -37,13 +33,13 @@
             android:id="@+id/txtMensagem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="5"
-            android:layout_weight="1"
-            android:maxHeight="150dp"
-            android:hint="Digite uma mensagem"
-            android:padding="10dp"
             android:layout_marginRight="5dp"
-            android:background="@drawable/input_background" />
+            android:layout_weight="1"
+            android:background="@drawable/input_background"
+            android:hint="Digite uma mensagem"
+            android:maxHeight="150dp"
+            android:maxLines="5"
+            android:padding="12dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/btnSend"
@@ -51,7 +47,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_menu_send"
             android:tint="#fff"
-            app:fabSize="mini"/>
+            app:fabSize="mini" />
 
     </LinearLayout>
 
